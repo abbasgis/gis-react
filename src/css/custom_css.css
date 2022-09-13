@@ -1,0 +1,21 @@
+.btn {
+    --bs-btn-padding-x: 0.3rem !important;
+    --bs-btn-padding-y: 0.01rem !important;
+}
+.dragZoom{
+    border: 3px solid red !important;
+
+}
+.ol-mouse-position {
+    top:unset !important;
+    bottom: 10px !important;
+    right: 15px;
+    font-size: 14px;
+    /*font-weight: bold;*/
+    text-align: center;
+    color: white;
+    position: absolute;
+    background: rgba(0,60,136,0.3);
+    border-radius: 4px;
+        padding: 2px;
+}

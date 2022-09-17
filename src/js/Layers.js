@@ -68,8 +68,30 @@ class LayersManager {
     }
 
     addOverlayLayers() {
+
+        let mvtLayerCanals = new VectorTileLayer({
+            title: "Irrigation Canals",
+            name: "irrigation_canals",
+            type: "base2",
+            legend: {ltype: 'ol', graphic: ''},
+            source: new VectorTileSource({
+                format: new MVT(),
+                url: "http://localhost:3338/layers/mvt_layer/1/{z}/{x}/{y}"
+            }),
+            style: function (feature, res) {
+                return new Style({
+                    stroke: new Stroke({
+                        width: 2,
+                        color: 'rgba(0, 102, 204)'
+                    })
+                })
+            }
+        });
+        this.overlayLayers.push(mvtLayerCanals)
         let mvtLayerDivisions = new VectorTileLayer({
             title: "Irrigation Divisions",
+            name: "irrigation_divisions",
+            legend: {ltype: 'ol', graphic: ''},
             type: "base2",
             source: new VectorTileSource({
                 format: new MVT(),
@@ -85,23 +107,6 @@ class LayersManager {
             }
         })
         this.overlayLayers.push(mvtLayerDivisions)
-        let mvtLayerCanals = new VectorTileLayer({
-            title: "Irrigation Canals",
-            type: "base2",
-            source: new VectorTileSource({
-                format: new MVT(),
-                url: "http://localhost:3338/layers/mvt_layer/1/{z}/{x}/{y}"
-            }),
-            style: function (feature, res) {
-                return new Style({
-                    stroke: new Stroke({
-                        width: 2,
-                        color: 'rgba(0, 102, 204)'
-                    })
-                })
-            }
-        });
-        this.overlayLayers.push(mvtLayerCanals)
     }
 
     getOverlayLayers() {

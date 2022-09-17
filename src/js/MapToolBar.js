@@ -11,12 +11,13 @@ import Polygon from "ol/geom/Polygon";
 import {inflateCoordinatesArray} from "ol/geom/flat/inflate";
 import ShowToast from "./common/Toast";
 import LineString from "ol/geom/LineString";
+import SLD2OL from "./common/SLD2OL";
 
 
 class MapToolBar extends Component {
     constructor(props) {
         super(props);
-        this.state = {olmap: props.map, lm: props.layerManager, btnClicked: 'default'}
+        this.state = {olmap: props.map, lm: props.layerManager, btnClicked: 'default', isToastSHow: false}
         this.handleClick = this.handleClick.bind(this);
     }
 
@@ -57,6 +58,19 @@ class MapToolBar extends Component {
                 break;
             case "identify":
                 this.setCurserDisplay("help");
+                let k = new SLD2OL()
+                let layer_selected = null;
+                let layers = this.state.lm.overlayLayers;
+                layers.forEach(function (layer) {
+                    if (layer.get('name')=== 'irrigation_canals') {
+                        layer_selected = layer;
+                    }
+                });
+                k.convertSLD2OL(layer_selected)
+                // this.setState((state) => {
+                //     return {isToastSHow: true};
+                // });
+                // this.setState({isToastSHow: true})
                 map.on('click', function (evt) {
                     if (mtb.state.btnClicked === "identify") {
                         mtb.displayFeatureInfo(evt.pixel, map);
@@ -68,7 +82,8 @@ class MapToolBar extends Component {
                 this.setCurserDisplay("default");
                 let vectorSource = this.state.lm.specialLayers["selectedFeatureLayer"].getSource();
                 vectorSource.clear();
-                mtb.props.toggleToast();
+
+                break;
             default:
                 break;
         }
@@ -134,31 +149,34 @@ class MapToolBar extends Component {
 
     render() {
         return (
-            <Stack direction="vertical" gap={2}
-                   style={{margin: "10px", zIndex: 2, position: "absolute", backgroundColor: "#eee4bb"}}
-                   aria-label="Toolbar">
-                <Button variant="outline-light" onClick={() => this.handleClick("full-extent")}><img
-                    src={require('../img/icons/ZoomFullExtent.png')}
-                    data-toggle="tooltip" title="Zoom to Full Extent" alt="Extent"></img> </Button>{' '}
-                <Button variant="outline-light" onClick={() => this.handleClick("zoom-in")}><img
-                    src={require('../img/icons/icon_zoomin.gif')}
-                    data-toggle="tooltip" title="Zoom In"></img> </Button>{' '}
-                <Button variant="outline-light" onClick={() => this.handleClick("zoom-out")}><img
-                    src={require('../img/icons/icon_zoomout.gif')}
-                    data-toggle="tooltip" title="Zoom Out"></img> </Button>{' '}
-                <Button variant="outline-light" onClick={() => this.handleClick("zoom-rectangle")}><img
-                    src={require('../img/icons/icon_zoomrect.gif')}
-                    data-toggle="tooltip" title="Zoom by Rectangle"></img> </Button>{' '}
-                <Button variant="outline-light" onClick={() => this.handleClick("pan")}><img
-                    src={require('../img/icons/icon_pan.gif')}
-                    data-toggle="tooltip" title="Zoom In"></img> </Button>{' '}
-                <Button variant="outline-light" onClick={() => this.handleClick("identify")}><img
-                    src={require('../img/icons/icon_information.png')}
-                    data-toggle="tooltip" title="Identify"></img> </Button>{' '}
-                <Button variant="outline-light" onClick={() => this.handleClick("clear")}><img
-                    src={require('../img/icons/yes.png')}
-                    data-toggle="tooltip" title="Clear All"></img> </Button>{' '}
-            </Stack>
+            <div>
+                <ShowToast isToastSHow={this.state.isToastSHow} title="asd" content="dfg"/>
+                <Stack direction="vertical" gap={2}
+                       style={{margin: "10px", zIndex: 2, position: "absolute", backgroundColor: "#eee4bb"}}
+                       aria-label="Toolbar">
+                    <Button variant="outline-light" onClick={() => this.handleClick("full-extent")}><img
+                        src={require('../img/icons/ZoomFullExtent.png')}
+                        data-toggle="tooltip" title="Zoom to Full Extent" alt="Extent"></img> </Button>{' '}
+                    <Button variant="outline-light" onClick={() => this.handleClick("zoom-in")}><img
+                        src={require('../img/icons/icon_zoomin.gif')}
+                        data-toggle="tooltip" title="Zoom In"></img> </Button>{' '}
+                    <Button variant="outline-light" onClick={() => this.handleClick("zoom-out")}><img
+                        src={require('../img/icons/icon_zoomout.gif')}
+                        data-toggle="tooltip" title="Zoom Out"></img> </Button>{' '}
+                    <Button variant="outline-light" onClick={() => this.handleClick("zoom-rectangle")}><img
+                        src={require('../img/icons/icon_zoomrect.gif')}
+                        data-toggle="tooltip" title="Zoom by Rectangle"></img> </Button>{' '}
+                    <Button variant="outline-light" onClick={() => this.handleClick("pan")}><img
+                        src={require('../img/icons/icon_pan.gif')}
+                        data-toggle="tooltip" title="Zoom In"></img> </Button>{' '}
+                    <Button variant="outline-light" onClick={() => this.handleClick("identify")}><img
+                        src={require('../img/icons/icon_information.png')}
+                        data-toggle="tooltip" title="Identify"></img> </Button>{' '}
+                    <Button variant="outline-light" onClick={() => this.handleClick("clear")}><img
+                        src={require('../img/icons/yes.png')}
+                        data-toggle="tooltip" title="Clear All"></img> </Button>{' '}
+                </Stack>
+            </div>
         );
 
     }

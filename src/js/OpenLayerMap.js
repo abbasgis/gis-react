@@ -1,6 +1,5 @@
 import React, {Component} from "react";
 import "ol/ol.css";
-import "ol-layerswitcher/src/ol-layerswitcher.css";
 import OlMap from "ol/Map";
 import OlView from "ol/View";
 import MapToolBar from "./MapToolBar";
@@ -9,14 +8,13 @@ import {getCenter} from "ol/extent";
 import LayersManager from "./Layers";
 import OLControls from "./OLControls";
 import LayerGroup from "ol/layer/Group";
-import ShowToast from "./common/Toast";
+
 
 class OpenLayerMap extends Component {
     constructor(props) {
         super(props);
         this.lm = new LayersManager();
-        this.state = {center: getCenter(Config.extent_3857), zoom: 7, isToastSHow: false};
-        this.toggleToast = this.toggleToast.bind(this)
+        this.state = {center: getCenter(Config.extent_3857), zoom: 9, isToastSHow: false};
         /*
         let vtLayer = new VectorTileLayer({
             declutter: true,
@@ -82,9 +80,6 @@ class OpenLayerMap extends Component {
 
     }
 
-    toggleToast() {
-        this.setState({isToastSHow: true})
-    }
 
     updateMap() {
         this.olmap.getView().setCenter(this.state.center);
@@ -100,8 +95,7 @@ class OpenLayerMap extends Component {
         // this.updateMap(); // Update map on render?
         return (
             <div>
-                <ShowToast isToastSHow={this.state.isToastSHow} title="asd" content="dfg"/>
-                <MapToolBar toggleToast={this.toggleToast} map={this.olmap} layerManager={this.lm}/>
+                <MapToolBar  map={this.olmap} layerManager={this.lm}/>
                 <div id="map" style={{width: "100%", height: "90%", position: "fixed"}}></div>
             </div>
         );

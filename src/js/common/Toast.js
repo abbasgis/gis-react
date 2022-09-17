@@ -1,14 +1,21 @@
 import Toast from 'react-bootstrap/Toast';
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {ToastContainer} from "react-bootstrap";
 
 function ShowToast(props) {
-    const [showA, setShowA] = useState(true);
-    const toggleShowA = () => setShowA(!props.isToastSHow);
+    const [show, setShow] = useState(props.isToastSHow);
+    const [close, setClose] = useState(false);
+    useEffect(() => {
+        if (close === true) {
+            alert(close)
+        }
+        setShow(props.isToastSHow)
+    }, [show, props.isToastSHow,close]);
+    const toggleShowA = () => setClose(!show);
     return (
-        <ToastContainer id="toast_id" className="p-3" position="middle-center"
+        <ToastContainer className="p-3" position="middle-center"
                         style={{width: "20%", height: "90%", position: "fixed"}}>
-            <Toast show={props.isToastSHow} onClose={toggleShowA} position="middle-center">
+            <Toast show={show} onClose={toggleShowA} position="middle-center">
                 <Toast.Header>
                     <strong className="me-auto">{props.title}</strong>
                     <small>11 mins ago</small>

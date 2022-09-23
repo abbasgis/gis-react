@@ -23,9 +23,9 @@ class SLD2OL {
                             maxColumnHeight: 300,
                             overflow: 'auto',
                             styles: [geostylerStyle.output],
-                            size: [600, 300]
+                            size: [200, 300] //w,h
                         });
-                        layer.legend = {ltype: 'sld', graphic: renderer}
+                        layer.legend = {sType: 'sld', graphic: renderer}
                         // console.log(JSON.stringify(geostylerStyle.output));
                         return olParser.writeStyle(geostylerStyle.output);
                     })

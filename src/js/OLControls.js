@@ -27,52 +27,22 @@ class OLControls {
         btn.name = "formBtn";
         lswitcher.on('drawlist', function (e) {
             var layer = e.layer;
-            let btn = document.createElement("IMG")
-            btn.alt = "Save";
-            btn.src = "https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_92x30dp.png"
-            btn.width = 50
-            btn.height = 30
-            btn.onclick = function () {
-                let f = layer.getSource().features[0]
-                let img = Legend.getLegendImage({
-                    /* given a style  and a geom type
-                    style: f.getStyle() || getFeatureStyle(f),
-                    typeGeom: f.getGeometry().getType()
-                    */
-                    /* or given a feature */
-                    feature: f.clone(),
-                    style: layer.getStyle()
-                });
-                // alert(layer.get('title'));
-            }
-            if (!(layer instanceof Group) && layer.get("title") === "Irrigation Canals") {
-                let tileGrid = layer.getSource().getTileGrid()
-                let f = layer.getSource().getFeaturesInExtent(tileGrid.getExtent());
-                if (f.length > 0) {
-                    const renderer = new LegendRenderer({
-                        maxColumnWidth: 300,
-                        maxColumnHeight: 300,
-                        overflow: 'auto',
-                        styles: [layer.getStyle()],
-                        size: [600, 300]
-                    });
+            if (!(layer instanceof Group) && layer.hasOwnProperty('legend')) {
+                if (layer.legend['sType'] === 'sld') {
                     layer.legend['graphic'].render(e.li);
+                } else if (layer.legend['sType'] === 'ol') {
+                    let tileGrid = layer.getSource().getTileGrid()
+                    let feature = layer.getSource().getFeaturesInExtent(tileGrid.getExtent());
+                    if (feature && feature.length > 0) {
+                        let img = Legend.getLegendImage({
+                            /* given a style  and a geom type*/
+                            style: layer.getStyle(),
+                            typeGeom: feature[0].getGeometry().getType()
 
-
-                    f = f[0]
-                    let img = Legend.getLegendImage({
-                        /* given a style  and a geom type*/
-                        style: layer.getStyle(),
-                        typeGeom: f.getGeometry().getType()
-
-                        /* or given a feature */
-                        // feature: f.clone(),
-                        // style: layer.getStyle()
-                    });
-                    // e.li.appendChild(btn)
-                    // e.li.appendChild(img)
+                        });
+                        e.li.appendChild(img)
+                    }
                 }
-
             }
 
             // document.getElementsByClassName('ol-layerswitcher-buttons')[0].append(e.li)

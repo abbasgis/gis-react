@@ -58,15 +58,6 @@ class MapToolBar extends Component {
                 break;
             case "identify":
                 this.setCurserDisplay("help");
-                let k = new SLD2OL()
-                let layer_selected = null;
-                let layers = this.state.lm.overlayLayers;
-                layers.forEach(function (layer) {
-                    if (layer.get('name')=== 'irrigation_canals') {
-                        layer_selected = layer;
-                    }
-                });
-                k.convertSLD2OL(layer_selected)
                 // this.setState((state) => {
                 //     return {isToastSHow: true};
                 // });

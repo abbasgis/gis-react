@@ -10,17 +10,40 @@ import VectorSource from "ol/source/Vector";
 import CircleStyle from "ol/style/Circle";
 import Fill from "ol/style/Fill";
 import Text from 'ol/style/Text';
+import Config from "./Config";
+import SLD2OL from "./common/SLD2OL";
+import Legend from "ol-ext/legend/Legend";
 
 class LayersManager {
     overlayLayers = []
     baseLayers = []
     specialLayers = []
+    layers = [
+        {
+            'title': 'Irrigation Divisions',
+            'name': 'irrigation_divisions',
+            'displayInSwitcher': true,
+            'lType': 'mvt',
+            'url': "http://localhost:3338/layers/mvt_layer/2/{z}/{x}/{y}",
+            'isVisible': true,
+            'legend': {sType: 'ol', graphic: null}, // stype is Style Type can be "ol" or "sld"
+        },
+        {
+            'title': 'Irrigation Canals',
+            'name': 'irrigation_canals',
+            'displayInSwitcher': true,
+            'lType': 'mvt',
+            'url': "http://localhost:3338/layers/mvt_layer/1/{z}/{x}/{y}",
+            'isVisible': true,
+            'legend': {sType: 'sld', graphic: null}, // stype is Style Type can be "ol" or "sld"
+        },
+    ]
 
     constructor() {
         this.addBaseLayer();
         this.addOverlayLayers();
+        this.updateLayersStyle(this.overlayLayers);
         this.addSelectedFeatureLayer();
-
     }
 
     addBaseLayer() {
@@ -63,50 +86,81 @@ class LayersManager {
         }
     };
 
-    getBaseLayersGroup() {
-        return this.baseLayers;
+    addOverlayLayers() {
+        let me = this;
+        this.layers.forEach(function (layer) {
+            // const layer = this.layers[index];
+            let mvt_layer = new VectorTileLayer({
+                title: layer.title,
+                name: layer.name,
+                visible: layer.isVisible,
+                displayInSwitcher: layer.displayInSwitcher,
+                legend: layer.legend,
+                source: new VectorTileSource({
+                    format: new MVT(),
+                    url: layer.url
+                }),
+                style: function (feature, res) {
+                    return me.getVectorLayerStyle(feature, layer)
+                }
+            });
+            me.overlayLayers.push(mvt_layer)
+        })
     }
 
-    addOverlayLayers() {
+    getLegendGraphic = function (layer) {
+        let tileGrid = layer.getSource().getTileGrid()
+        let feature = layer.getSource().getFeaturesInExtent(tileGrid.getExtent());
+        let img = Legend.getLegendImage({
+            /* given a style  and a geom type*/
+            style: layer.getStyle(),
+            typeGeom: feature.getGeometry().getType()
 
-        let mvtLayerCanals = new VectorTileLayer({
-            title: "Irrigation Canals",
-            name: "irrigation_canals",
-            type: "base2",
-            legend: {ltype: 'ol', graphic: ''},
-            source: new VectorTileSource({
-                format: new MVT(),
-                url: "http://localhost:3338/layers/mvt_layer/1/{z}/{x}/{y}"
-            }),
-            style: function (feature, res) {
-                return new Style({
-                    stroke: new Stroke({
-                        width: 2,
-                        color: 'rgba(0, 102, 204)'
-                    })
-                })
+        });
+        return img;
+    }
+    updateLayersStyle = function (arrLayers) {
+        let k = new SLD2OL()
+        const me=this;
+        arrLayers.forEach(function (layer) {
+            if (layer.get('legend')['sType'] === 'sld') {
+                k.convertSLD2OL(layer)
+            }else if(layer.get('legend')['sType'] === 'ol'){
+                layer.legend = {sType: 'ol', graphic: null}
             }
         });
-        this.overlayLayers.push(mvtLayerCanals)
-        let mvtLayerDivisions = new VectorTileLayer({
-            title: "Irrigation Divisions",
-            name: "irrigation_divisions",
-            legend: {ltype: 'ol', graphic: ''},
-            type: "base2",
-            source: new VectorTileSource({
-                format: new MVT(),
-                url: "http://localhost:3338/layers/mvt_layer/12/{z}/{x}/{y}"
-            }),
-            style: function (feature, res) {
-                return new Style({
-                    stroke: new Stroke({
-                        width: 2,
-                        color: 'rgb(10,12,94)'
+    }
+
+    getVectorLayerStyle(feature, layer) {
+        if (layer.legend['sType'] === 'ol') {
+            let style = null;
+            switch (layer['name']) {
+                case "irrigation_canals":
+                    style = new Style({
+                        stroke: new Stroke({
+                            width: 2,
+                            color: 'rgba(0, 102, 204)'
+                        })
                     })
-                })
+                    break;
+                case "irrigation_divisions":
+                    style = new Style({
+                        stroke: new Stroke({
+                            width: 2,
+                            color: 'rgb(10,12,94)'
+                        })
+                    })
+                    break;
+                default:
+                    break
             }
-        })
-        this.overlayLayers.push(mvtLayerDivisions)
+            return style;
+        }
+
+    }
+
+    getBaseLayersGroup() {
+        return this.baseLayers;
     }
 
     getOverlayLayers() {
